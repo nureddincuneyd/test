@@ -2,16 +2,24 @@ import os
 import torch
 import ffmpeg
 import whisperx
-from pytube import YouTube
+import yt_dlp
 
-# YouTube videosunu indir
+# YouTube videosunu indir (yt-dlp ile)
 def download_youtube_video(video_url, output_path="downloads"):
     os.makedirs(output_path, exist_ok=True)
-    yt = YouTube(video_url)
-    video_stream = yt.streams.filter(file_extension="mp4", progressive=True).first()
-    video_path = os.path.join(output_path, yt.title + ".mp4")
-    video_stream.download(output_path, filename=yt.title + ".mp4")
-    return video_path
+    output_template = os.path.join(output_path, "%(title)s.%(ext)s")
+
+    ydl_opts = {
+        "format": "bestvideo+bestaudio/best",
+        "outtmpl": output_template,
+        "merge_output_format": "mp4",
+    }
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        info_dict = ydl.extract_info(video_url, download=True)
+        video_filename = os.path.join(output_path, f"{info_dict['title']}.mp4")
+
+    return video_filename
 
 # Videodan sesi çıkar ve MP3 olarak kaydet (FFmpeg Kullanarak)
 def extract_audio_ffmpeg(video_path, output_path="audio"):
@@ -64,7 +72,6 @@ def process_video(video_url):
     print(f"✅ Transkripsiyon tamamlandı: {text_output}")
 
     return text_output
-
 
 # Örnek Kullanım
 if __name__ == "__main__":
