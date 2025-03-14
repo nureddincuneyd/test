@@ -4,12 +4,12 @@ from datetime import datetime
 from torch.amp.autocast_mode import autocast
 import os
 
-def init_model(gpu_id=0):
+def init_model():
     """
     Belirtilen GPU'ya (ya da eğer CUDA yoksa CPU'ya) Whisper modelini yükler.
     Varsayılan olarak GPU 0'ı kullanır.
     """
-    device = f'cuda:{gpu_id}' if torch.cuda.is_available() else 'cpu'
+    device = f'cuda:' if torch.cuda.is_available() else 'cpu'
     print(f"Model {device} üzerinde yükleniyor...")
     model = wh.load_model("turbo", device=device)
     return model
