@@ -1,40 +1,15 @@
 import os
 import torch
-import ffmpeg
 import whisperx
-import yt_dlp
+from datetime import datetime
 
-# YouTube videosunu indir (yt-dlp ile)
-def download_youtube_video(video_url, output_path="downloads"):
-    os.makedirs(output_path, exist_ok=True)
-    output_template = os.path.join(output_path, "%(title)s.%(ext)s")
-
-    ydl_opts = {
-        "format": "bestvideo+bestaudio/best",
-        "outtmpl": output_template,
-        "merge_output_format": "mp4",
-    }
-
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info_dict = ydl.extract_info(video_url, download=True)
-        video_filename = os.path.join(output_path, f"{info_dict['title']}.mp4")
-
-    return video_filename
-
-# Videodan sesi çıkar ve MP3 olarak kaydet (FFmpeg Kullanarak)
-def extract_audio_ffmpeg(video_path, output_path="audio"):
-    os.makedirs(output_path, exist_ok=True)
-    audio_path = os.path.join(output_path, os.path.basename(video_path).replace(".mp4", ".mp3"))
-
-    # FFmpeg ile ses dosyasını çıkar
-    ffmpeg.input(video_path).output(audio_path, format="mp3", acodec="libmp3lame").run(overwrite_output=True)
-    
-    return audio_path
 
 # WhisperX ile transkripsiyon yap (GPU destekli)
 def transcribe_audio(audio_path, model_name="large-v2", batch_size=16):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     num_gpus = torch.cuda.device_count()
+    print(device)
+    print(num_gpus)
 
     print(f"💡 Kullanılan Cihaz: {device}, GPU Sayısı: {num_gpus}")
 
@@ -54,14 +29,16 @@ def transcribe_audio(audio_path, model_name="large-v2", batch_size=16):
 # Ana işlev (Tüm süreci yönetir)
 def process_video(video_url):
     print("📥 YouTube videosu indiriliyor...")
-    video_path = download_youtube_video(video_url)
+    #video_path = download_youtube_video(video_url)
 
     print("🎵 Sesi çıkarılıyor (FFmpeg kullanılarak)...")
-    audio_path = extract_audio_ffmpeg(video_path)
+    audio_path = "/home/ilk.mp3"#extract_audio_ffmpeg(video_path)
 
     print("📝 Ses metne çevriliyor (WhisperX kullanılarak)...")
+    startDate = datetime.now
     transcription = transcribe_audio(audio_path)
-
+    resultTime = datetime.noe - startDate
+    print(f"sonuc Suresi: {resultTime.total_seconds()} saniye")
     text_output = os.path.join("transcriptions", os.path.basename(audio_path).replace(".mp3", ".txt"))
     os.makedirs("transcriptions", exist_ok=True)
 
@@ -82,11 +59,3 @@ if __name__ == "__main__":
     print("-"*50)
     print("Video 1 Başılıyor...")
     process_video(video1)
-
-    print("-"*50)
-    print("Video 2 Başılıyor...")
-    process_video(video2)
-
-    print("-"*50)
-    print("Video 3 Başılıyor...")
-    process_video(video3)
