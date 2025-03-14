@@ -4,18 +4,18 @@ from datetime import datetime
 from torch.amp.autocast_mode import autocast
 import os
 
-def init_model(device="cuda", gpu_index=0):
+def init_model(device="cuda", device_index=0):
     """
     WhisperX modelini yükler.
     device: "cuda" veya "cpu"
-    gpu_index: birden fazla GPU varsa, kullanılacak GPU indexi
+    device_index: birden fazla GPU varsa, kullanılacak GPU indexi
     """
-    print(f"Model {device} üzerinde, gpu_index={gpu_index} ile yükleniyor...")
+    print(f"Model {device} üzerinde, device_index={device_index} ile yükleniyor...")
     model = wh.load_model(
         "turbo", 
         device=device, 
-        gpu_index=gpu_index,        # GPU indeksini belirtin
-        compute_type="float16"      # Hata alırsanız "float32" veya "int8_float16" vs. deneyebilirsiniz
+        device_index=device_index,   # "gpu_index" yerine "device_index"
+        compute_type="float16"       # Donanımınıza göre "float32" de kullanabilirsiniz
     )
     return model
 
@@ -28,6 +28,7 @@ def process_file_speech_to_text(audio_file_path, model):
         raise FileNotFoundError(f"Ses dosyası bulunamadı: {audio_file_path}")
 
     start_time = datetime.now()
+    # Eğer CPU'da çalıştırıyorsanız autocast('cuda') yerine autocast('cpu') veya tamamen kaldırabilirsiniz.
     with autocast('cuda'), torch.no_grad():
         result = model.transcribe(audio_file_path)
     total_time = datetime.now() - start_time
@@ -49,8 +50,8 @@ def process_file_speech_to_text(audio_file_path, model):
 
 if __name__ == '__main__':
     # Modeli GPU'da (cuda) veya CPU'da (cpu) çalıştırabilirsiniz
-    # GPU indexini de belirtebilirsiniz
-    model = init_model(device="cuda", gpu_index=0)
+    # device_index=0 kullanarak 0. GPU'yu seçmiş oluyoruz.
+    model = init_model(device="cuda", device_index=0)
 
     audio_file = "/home/ilk.mp3"  # Ses dosyası yolu
 
