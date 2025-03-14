@@ -4,14 +4,19 @@ from datetime import datetime
 from torch.amp.autocast_mode import autocast
 import os
 
-def init_model():
+def init_model(device="cuda", gpu_index=0):
     """
-    Belirtilen GPU'ya (ya da eğer CUDA yoksa CPU'ya) Whisper modelini yükler.
-    Varsayılan olarak GPU 0'ı kullanır.
+    WhisperX modelini yükler.
+    device: "cuda" veya "cpu"
+    gpu_index: birden fazla GPU varsa, kullanılacak GPU indexi
     """
-    device = f'cuda:' if torch.cuda.is_available() else 'cpu'
-    print(f"Model {device} üzerinde yükleniyor...")
-    model = wh.load_model("turbo", device=device)
+    print(f"Model {device} üzerinde, gpu_index={gpu_index} ile yükleniyor...")
+    model = wh.load_model(
+        "turbo", 
+        device=device, 
+        gpu_index=gpu_index,        # GPU indeksini belirtin
+        compute_type="float16"      # Hata alırsanız "float32" veya "int8_float16" vs. deneyebilirsiniz
+    )
     return model
 
 def process_file_speech_to_text(audio_file_path, model):
@@ -43,13 +48,12 @@ def process_file_speech_to_text(audio_file_path, model):
     return result['text']
 
 if __name__ == '__main__':
-    # GPU veya CPU üzerinde modelimizi başlatıyoruz
-    model = init_model()  # GPU ID'yi değiştirebilirsiniz
+    # Modeli GPU'da (cuda) veya CPU'da (cpu) çalıştırabilirsiniz
+    # GPU indexini de belirtebilirsiniz
+    model = init_model(device="cuda", gpu_index=0)
 
-    # Metne dönüştürmek istediğiniz ses dosyasının yolunu burada belirtiyoruz
-    audio_file = "/home/ilk.mp3"  # Örnek isim
+    audio_file = "/home/ilk.mp3"  # Ses dosyası yolu
 
-    # Speech-to-text işlemi
     try:
         text_output = process_file_speech_to_text(audio_file, model)
         print("Dönüştürülmüş Metin:")
