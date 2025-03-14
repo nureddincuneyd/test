@@ -44,7 +44,7 @@ def process_file_speech_to_text(audio_file_path, model):
 
 if __name__ == '__main__':
     # GPU veya CPU üzerinde modelimizi başlatıyoruz
-    model = init_model(gpu_id=0)  # GPU ID'yi değiştirebilirsiniz
+    model = init_model()  # GPU ID'yi değiştirebilirsiniz
 
     # Metne dönüştürmek istediğiniz ses dosyasının yolunu burada belirtiyoruz
     audio_file = "/home/ilk.mp3"  # Örnek isim
