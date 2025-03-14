@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 # WhisperX ile transkripsiyon yap (GPU destekli)
-def transcribe_audio(audio_path, model_name="large-v2", batch_size=16):
+def transcribe_audio(audio_path, model_name="turbo", batch_size=32):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     num_gpus = torch.cuda.device_count()
     print(device)
