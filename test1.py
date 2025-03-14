@@ -1,5 +1,5 @@
 import torch
-import whisper as wh
+import whisperx as wh
 from datetime import datetime
 from torch.amp.autocast_mode import autocast
 import os
