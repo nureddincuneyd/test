@@ -65,7 +65,21 @@ def process_video(video_url):
 
     return text_output
 
+
 # Örnek Kullanım
 if __name__ == "__main__":
-    video_url = "https://www.youtube.com/watch?v=EXAMPLE_VIDEO_ID"
-    process_video(video_url)
+    video1 = "https://youtu.be/inxnU4C06IQ" # 10:10
+    video2 = "https://youtu.be/7G347yOxmrQ" # 14:52
+    video3 = "https://youtu.be/DBfuRaDSS8g" # 23:17
+
+    print("-"*50)
+    print("Video 1 Başılıyor...")
+    process_video(video1)
+
+    print("-"*50)
+    print("Video 2 Başılıyor...")
+    process_video(video2)
+
+    print("-"*50)
+    print("Video 3 Başılıyor...")
+    process_video(video3)
