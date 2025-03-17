@@ -13,12 +13,23 @@ if num_gpus < 6:
 torch.set_num_threads(num_gpus * 2)  # CPU kullanımı da artırılabilir
 
 # Dosya indirme fonksiyonu
-def download_audio(url, save_path="audio.mp3"):
+# Dosya indirme fonksiyonu (uzantıyı koruyarak yeni isim verme)
+def download_audio(url, new_name="ses_dosyasi"):
     response = requests.get(url, stream=True)
+    
     if response.status_code == 200:
+        # Orijinal dosya adını URL'den al
+        original_filename = url.split("/")[-1]  # URL'nin son kısmı dosya adıdır
+        original_ext = os.path.splitext(original_filename)[-1]  # Dosyanın uzantısını al
+        
+        # Yeni dosya adı oluştur (uzantıyı koruyarak)
+        save_path = f"{new_name}{original_ext}"
+        
+        # Dosyayı kaydet
         with open(save_path, "wb") as f:
             for chunk in response.iter_content(chunk_size=1024):
                 f.write(chunk)
+        
         print(f"Ses dosyası indirildi: {save_path}")
         return save_path
     else:
